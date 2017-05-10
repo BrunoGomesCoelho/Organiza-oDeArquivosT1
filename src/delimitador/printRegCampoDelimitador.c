@@ -9,7 +9,7 @@
 void delimiter_printRecordField(FILE *fp, int n) {
 	int regPos;
 	
-	printf("Digite o número do registro que deseja acessar: \n");
+	printf("\n\nDigite o número do registro que deseja acessar: \n");
 	scanf("%d", &regPos);
 	
 	// If the regPos isn't valid, return to the main menu

@@ -121,7 +121,7 @@ int calculateRecordSize(t_field field) {
 void printField(t_field field, int offset) {
 
 	printf("\n");
-				
+
 	if (strcmp(field.name, "null")) 
 		printf("\t%d - \t\t%s\n", offset, field.name);
 	if (strcmp(field.domain, "null")) 
@@ -168,7 +168,19 @@ t_field readRecord(FILE *input) {
 			else if ((unsigned char) string[j] == (unsigned char) 0xC3) // Ã
 				string[j] = 'A';
 			else if ((unsigned char) string[j] == (unsigned char) 0xE1) // á
-				string[j] = 'a';				
+				string[j] = 'a';
+			else if ((unsigned char) string[j] == (unsigned char) 0xF3) // ó
+				string[j] = 'o';
+			else if ((unsigned char) string[j] == (unsigned char) 0xF4) // ô
+				string[j] = 'e';						
+			else if ((unsigned char) string[j] == (unsigned char) 0xF5) // õ
+				string[j] = 'o';
+			else if ((unsigned char) string[j] == (unsigned char) 0xE9) // é
+				string[j] = 'e';
+			else if ((unsigned char) string[j] == (unsigned char) 0xCA) // Ê
+				string[j] = 'E';
+			else if ((unsigned char) string[j] == (unsigned char) 0xDA) // Ú
+				string[j] = 'U';								
 		}
 		
         field.data[i] = string;

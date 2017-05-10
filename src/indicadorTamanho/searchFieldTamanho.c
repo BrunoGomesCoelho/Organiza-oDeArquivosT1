@@ -43,8 +43,7 @@ void size_searchField(FILE *fp, int n) {
 			// Verifies if its the field the user is looking for, with the corrects contents
 			if( searchFound(search, field)) {
 			
-				/* TODO: Modificar a impressão par ficar bonitinho, acho que o count não faz sentido */
-				printField(field, record_size);
+				printField(field, i);
 				found = true;
 				
 				// Asks the user if he wants to continue the search.

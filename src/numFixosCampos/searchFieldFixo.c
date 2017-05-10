@@ -36,7 +36,6 @@ void fixed_searchField(FILE *fp, int n) {
 		
 			// Verifies if its the field the user is looking for, with the corrects contents
 			if( searchFound(search, field)) {
-				/* TODO: Modificar a impressão par ficar bonitinho, acho que o count não faz sentido */
 				printField(field, i);
 				found = true;
 				
