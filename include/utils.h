@@ -9,9 +9,6 @@
 #define FIELD int
 
 // Size of the fields that hava a fixed length, as chars
-#define SIZE_DOCUMENT 19
-#define SIZE_TIME 19
-#define SIZE_TICKET 4
 #define SIZE_FIXED 30
 
 
@@ -64,12 +61,6 @@ typedef struct  {
     int dateTimeOri_size, dateTimeUpd_size, record_size;
 } RECORD_SIZE;
 
-
-typedef enum {
-	ALGO,
-    // NONE,om essa linha não compila, está redefinindo não do outro enum.
-    // file organization types
-} FTYPE;
 
 void printField(t_field field, int ticket);
 

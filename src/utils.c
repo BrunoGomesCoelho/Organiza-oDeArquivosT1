@@ -4,44 +4,39 @@
 #include <string.h>	// strcmp
 #include <ctype.h> 	// isdigit
 
-
-//TODO: remove
-#include <locale.h>
-
-
 #include <utils.h>
 
 
-// TODO: Simplificar a readLine, não precisa ter um seprador e um fim_linha.
-// TODO: Traduzir para inglês.
-char *readLine(FILE *stream, char separador, char fim_linha) {
-    /* Le de um stream um input até encontrar o char separador,  fim_linha ou ser o fim do arq.
-    Alocamos 50 bytes pra o input, e caso passe disso, incrementamos de 50 em 50 até ter toda a mensagem. 
-    Depois, eliminamos bytes desnecessários */
-    int i = 0, realloc_count = 0; //realloc_count guarda a qtd de reallocs ja feitos
-    char letra, *string;
+/* Reads input from a given stream (stdin in our case).
+	Reads until it finds either the a 'r' or the parameters separator or endLine
+	We start off allocating 50 bytes for the input and in case we need more, we increment
+	in 50 bytes until the whole message has been read. */
+char *readLine(FILE *stream, char separator, char endLine) {
+    int i = 0, reallocCount = 0;
+    char letter, *string;
     char carriageReturn = '\r';
     string = (char *) malloc(50 * sizeof(char));
-    letra = fgetc(stream);
+    letter = fgetc(stream);
 
 
-    while (letra != separador && letra != fim_linha && letra != carriageReturn && letra != EOF) { 
-        //leia até o usario pressionar separador, fim_lina ou ser o fim do arquivo
-        string[i] = letra;
+    while (letter != separator && letter != endLine && letter != carriageReturn && letter != EOF) { 
+        // Reads until it finds separator, endLine, 'r' or a EOF.
+        string[i] = letter;
         i++;
-        letra = fgetc(stream);
-        if (i >= 50*(realloc_count +1)) { 
-            //se houver mais chars do que o que já alocamos, realloc mais
-            string = (char *) realloc(string, 50 * (realloc_count +2)*sizeof(char));
-            realloc_count++;
+        letter = fgetc(stream);
+        if (i >= 50*(reallocCount +1)) { 
+            // If there's more characters than we currently have, allocate more
+            string = (char *) realloc(string, 50 * (reallocCount +2)*sizeof(char));
+            reallocCount++;
         }
-    } // i sai com o tamanho da string
-    string = realloc(string, (i+1)*sizeof(char)); //elimina bytes desnecessários
-    string[i] = '\0'; //adicionando um \0 no fim da string
+    } // i leaves the while with the size of the string
+    string = realloc(string, (i+1)*sizeof(char)); // Removes uncessary bytes
+    string[i] = '\0'; // Adds a \0 to the end.
     return string;
 }
 
 
+/* Reads all the fields in a register. Does not read the register size, possible delimiters, etc */
 t_field readFields(FILE *fp) {
     int domain_size, name_size, city_size, state_size;
     t_field field;
@@ -86,7 +81,7 @@ t_field readFields(FILE *fp) {
 
         // Read the ticket number
         field.ticket = (char *) malloc(sizeof(char) * (SIZE_FIXED));
-        fread(field.ticket, SIZE_FIXED, 1, fp);  // Indicates the size of a int   
+        fread(field.ticket, SIZE_FIXED, 1, fp);
         
     }
     
@@ -94,6 +89,7 @@ t_field readFields(FILE *fp) {
 }
 
 
+/* Frees all the memory used storing a field */
 void freeFields(t_field field) {
 	free(field.domain);
 	free(field.document_number);
@@ -106,6 +102,7 @@ void freeFields(t_field field) {
 }
 
 
+/* Calculates the size of a register */
 int calculateRecordSize(t_field field) {
     int regSize = 0, i;
 
@@ -120,6 +117,7 @@ int calculateRecordSize(t_field field) {
 }
 
 
+/* Prints all the fields in a given register */
 void printField(t_field field, int offset) {
 
 	printf("\n");
@@ -144,17 +142,37 @@ void printField(t_field field, int offset) {
 }
 
 
-/*Loads the record into t_field struct*/
+/* Loads the record into t_field struct */
 t_field readRecord(FILE *input) {
-    char *string;
-    int i;
+    char *string, size;
+    int i, j;
     t_field field;
     field.data = malloc(sizeof(char *)*8);
 
     for(i = 0; i < 8; i++) {
         string = readLine(input, ';', '\n');
+        size = strlen(string);
+        
+        // Removes any accented characters from the string
+		for(j = 0; j < size; j++) {
+			if ( (unsigned char) string[j] == (unsigned char) 0xED) // í
+				string[j] = 'i';
+			else if ((unsigned char) string[j] == (unsigned char) 0xCD) // Í
+				string[j] = 'I';
+			else if ((unsigned char) string[j] == (unsigned char) 0xE7) // ç
+				string[j] = 'c';
+			else if ((unsigned char) string[j] == (unsigned char) 0xC7) // Ç
+				string[j] = 'C';
+			else if ((unsigned char) string[j] == (unsigned char) 0xE3) // ã
+				string[j] = 'a';
+			else if ((unsigned char) string[j] == (unsigned char) 0xC3) // Ã
+				string[j] = 'A';
+			else if ((unsigned char) string[j] == (unsigned char) 0xE1) // á
+				string[j] = 'a';				
+		}
+		
         field.data[i] = string;
-        field.dataSize[i] = strlen(string) + 1; // strlen(string) + \0
+        field.dataSize[i] = size + 1; // strlen(string) + \0
         
         // If its a fixed sized field, we check if it's not bigger than what we store
         if(i == 1 || i == 5 || i == 6 || i == 7) 
@@ -170,8 +188,8 @@ t_field readRecord(FILE *input) {
 }
 
 
+/* Asks the user if he wants to continue printing the registers. */
 char userContinue() {
-	// Asks the user if he wants to continue printing the registers.
 	int count = 0;
 	char c = 0;
 	printf("Digite 'p' para o próximo registro ou 'c' para abortar\n");
@@ -191,18 +209,10 @@ char userContinue() {
 }
 
 
+/* Frees the memory in a record. */
 void freeRecord(t_field field) {
-	// Frees the memory in a record.
     int i;
     for(i = 0; i < 8; i++) free(field.data[i]);
     free(field.data);
 }
 
-/*==========TEST AND DEBUGGING FUNCTIONS==========*/
-
-void printRecord(t_field field) {
-	int i;
-    for(i = 0; i < 8; i++)
-        printf("%s;", field.data[i]);
-    printf("#\n");
-}

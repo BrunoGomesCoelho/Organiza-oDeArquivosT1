@@ -1,16 +1,15 @@
 
-/*==========Integrantes==========*/
+/*==============Members==============*/
 // Alex Sander Ribeiro da Silva 9779350
-// Bruno Gomes Coelho 9791160
-// Gabriel de Melo Cruz 9763043
-// Marcello Pagano Silva 9791031
-
-
-// TODO: Colocar os nomes dos integrantes em todos os arquivos
+// Bruno Gomes Coelho 			9791160
+// Gabriel de Melo Cruz 		9763043
+// Marcello Pagano Silva 		9791031
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <locale.h>
+
+// Our own includes
+#include <printRegFieldMain.h>
 
 #include <utils.h>
 #include <printFixo.h>
@@ -22,6 +21,10 @@
 #include <searchFieldTamanho.h>
 #include <searchFieldFixo.h>
 #include <searchFieldDelimitador.h>
+#include <printRegCampoFixo.h>
+#include <printRegCampoDelimitador.h>
+#include <printRegCampoTamanho.h>
+
 
 void printMenu() {
 	printf("\n\n");
@@ -44,7 +47,7 @@ int main(int argc, char *argv[]) {
     TYPE_REG regType = NONE;
     FILE *input = fopen("Dominios.csv", "r+"), *output;
     bool read = false;
-    int nregs, nfields; // offset = 0; variavel nao usado
+    int nregs, nfields;
     int offset;
     char endPrint[37] = "Fim da impressão, voltando ao menu\n\0";
     char errorAlreadyRead[48] = "Arquivo já lido, abortando e voltando ao menu\n\0";
@@ -57,23 +60,20 @@ int main(int argc, char *argv[]) {
 	    printf("Digite 3 para registros de tamanho variável com número fixo de campos\n");
 	    scanf("%d", &regType);
     }
-    
-	/////////////////////////////////////////////////////////// DEBUGGING ///////////////////////////////////////////////////////////  
-	char placeholder[50] = "Função ainda não implementada.\n";
    
-	setlocale(LC_ALL, "Portuguese");
    
+   	// Main menu
     while(op != EXIT) {
         printMenu();
         scanf("%d", &op);
         
-    	// if the csv file has already been read, abort
+    	// If the csv file has already been read, abort
         if (op == READ_FROM_FILE && read) {
         	printf("%s", errorAlreadyRead);
         	continue;
     	}
         
-        // if the csv file has not yet been read, abort these functions
+        // If the csv file has not yet been read, abort these functions
         if (op == PRINT_ALL || op == SEARCH_BY_RECORD || op == SEARCH_BY_FIELD ||
         	op == SEARCH_BY_RECORD_BY_FIELD) {
         	 if (!read) {
@@ -99,14 +99,12 @@ int main(int argc, char *argv[]) {
 						size_printRecord(output, nregs, offset);
 				        break;
 				    case SEARCH_BY_FIELD:
-				    	// ponteiro para o arquivo e a qtd de registros
 					    size_searchField(output, nregs);
 				        break;
 				    case SEARCH_BY_RECORD_BY_FIELD:
-				    	printf("%s", placeholder);
+				    	size_printRecordField(output, nregs);
 				        break;
 				    case EXIT:
-				        //closeFiles(input, output); // fclose and frees
 				        break;
 				    default:
 				        printf("Opcao Invalida, voltando ao menu\n");
@@ -130,14 +128,12 @@ int main(int argc, char *argv[]) {
 						delimiter_printRecord(output, nregs, offset); 
 				        break;
 				    case SEARCH_BY_FIELD:
-				    	// ponteiro para o arquivo e a qtd de registros
 					    delimiter_searchField(output, nregs);
 				        break;
 				    case SEARCH_BY_RECORD_BY_FIELD:
-				    	printf("%s", placeholder);
+				    	delimiter_printRecordField(output, nregs);
 				        break;
 				    case EXIT:
-				        //closeFiles(input, output); // fclose and frees
 				        break;
 				    default:
 				        printf("Opcao Invalida\n");
@@ -161,14 +157,12 @@ int main(int argc, char *argv[]) {
 				    	fixed_printRecord(output, nregs, offset);
 				        break;
 				    case SEARCH_BY_FIELD:
-				    	// ponteiro para o arquivo e a qtd de registros
 					    fixed_searchField(output, nregs);
 				        break;
 				    case SEARCH_BY_RECORD_BY_FIELD:
-				    	printf("%s", placeholder);
+				    	fixed_printRecordField(output, nregs);
 				        break;
 				    case EXIT:
-				        //closeFiles(input, output); // fclose and frees
 				        break;
 				    default:
 				        printf("Opcao Invalida\n");

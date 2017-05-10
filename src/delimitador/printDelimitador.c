@@ -4,19 +4,6 @@
 
 #include <utils.h>
 
-/*
-	
-	1 dominio 			string
-	2 documento 		string
-	3 nome 				string
-	4 cidade			string
-	5 uf 				string
-	6 dataHora 			string
-	7 dataHoraAtuli 	string
-	8 ticket 			string
-
-*/
-
 
 void delimiter_printDataBase(FILE *fp, int n) {
 	t_field aux;
@@ -53,16 +40,11 @@ void delimiter_printDataBase(FILE *fp, int n) {
 }
 
 
-void delimiter_printRecord(FILE *fp, int n, int offset) {
+/* Finds a given field given ints position. */
+t_field delimiter_findRecord(FILE *fp, int n, int offset) {
 	t_field aux;
 	char delim;
-	int i = 0; 
-
-	// If the offset isn't valid, just return
-	if (offset < 0 || offset >= n) {
-		printf("Please, request a valid record number\n");
-		return;
-	}
+	int i = 0;
 
 	for (i = 0; i < offset; i++) {
 		// Read the fields
@@ -76,11 +58,28 @@ void delimiter_printRecord(FILE *fp, int n, int offset) {
 		
 	}
 
-	// Read the fields from the request offset
+	// Read the fields from the requested offset
 	aux = readFields(fp);
 
-	// Print them
-	printField(aux, i);
+	return aux;
+}
+
+
+/* Prints a record given its number */
+void delimiter_printRecord(FILE *fp, int n, int offset) {
+	t_field aux;
+	
+	// Reads the correct record
+	aux = delimiter_findRecord(fp, n, offset);
+	
+	// If the offset isn't valid, return to the main menu
+	if (offset < 0 || offset >= n) {
+		printf("Por favor digite um número de registro válido! Voltando ao menu\n");
+		return;
+	}
+
+	// Prints it
+	printField(aux, offset);
 
 	// Frees used memory
 	freeFields(aux);	
@@ -88,3 +87,5 @@ void delimiter_printRecord(FILE *fp, int n, int offset) {
 	// Make the file pointer return to the begging of the file
 	rewind(fp);
 } 
+
+

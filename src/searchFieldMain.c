@@ -9,6 +9,7 @@
 #include <utils.h>
 
 
+/* Function that implements the menu of a search for a specific field. */
 t_searchField searchFieldMain() {
 	bool validInput = false;
 	int op = -1;
@@ -18,10 +19,8 @@ t_searchField searchFieldMain() {
 	
 	printf("\n\n");
 	
-	// TODO: explicar como devera ser digitado os inputs com tamanho fixo.
 	while( !validInput) {	
 		while (op < 0 || op >= 9) {
-			// TODO: Reordenar isso
 			printf("Digite o número correspondente ao campo que quer pesquisar nos registros, ou 0 para abortar e voltar ao menu\n");
 			printf("1 - Domain\n");
 			printf("2 - Documento\n");
@@ -39,17 +38,19 @@ t_searchField searchFieldMain() {
 				
 			if (op == 0)
 				return search;
-		}
-	
+		}	
 		printf("\n");
-		// reads the user input
+		
+		// Reads the user input
 		printf("Digite o campo: ");
+		
 		// Removes leading '\n'
 		scanf("\n");
+		
 		search.fieldType = op;
 		search.query = readLine(stdin, '\n', '\n');
 		
-		// if the user has decided to abortar
+		// If the user has decided to abort
 		if (strlen(search.query) == 0) {
 			search.fieldType = INVALID;
 			return search;
@@ -69,6 +70,7 @@ t_searchField searchFieldMain() {
 }
 
 
+/* Verifies if we found the field the user was searching for */
 bool searchFound(t_searchField search, t_field field) {
 
 	if( (search.fieldType == DOMAIN && strcmp(field.domain, search.query) == 0) ||
@@ -85,6 +87,7 @@ bool searchFound(t_searchField search, t_field field) {
 }
 
 
+/* Prompts the user to type in 'p' to carry on, or 'c' to abort */
 char continueSearch() {
 	int count = 0;
 	char c = 0;
